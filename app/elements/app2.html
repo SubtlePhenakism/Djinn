@@ -27,6 +27,11 @@
 <link href="/bower_components/core-animated-pages/core-animated-pages.html" rel="import"> 
 
 <link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+<link href="/bower_components/core-selector/core-selector.html" rel="import">
+<link href="/bower_components/paper-shadow/paper-shadow.html" rel="import">
+<link rel="import" href="/bower_components/core-item/core-item.html">
+
+  <link href="paper-item.html" rel="import">
 
 <polymer-element name="idea-app">
   <template>
@@ -40,11 +45,14 @@
       <pvc-globals values="{{globals}}"></pvc-globals>
 
   <core-drawer-panel responsiveWidth="600px" id="drawerPanel" narrow="{{narrow}}">
-            <core-header-panel drawer mode="waterfall-tall">
-                <core-toolbar class="{{ {tall : !narrow} | tokenList }}"></core-toolbar>
+            <core-header-panel drawer mode="waterfall">
+                <core-toolbar class="{{ {'medium-tall' : !narrow} | tokenList }}"></core-toolbar>
+                <core-menu id="side-nav" on-core-select="{{ menuSelect }}"></core-menu>
+                    <core-item label="My Ideas" tag="my-ideas" url="/elements/pages/my-ideas.html" horizontal center layout></core-item>
+                    <core-item label="Groups" tag="my-ideas" url="/elements/pages/my-ideas.html" horizontal center layout></core-item>
             </core-header-panel>
             <core-header-panel main mode="waterfall">
-                <core-toolbar class="{{ {tall : !narrow} | tokenList }}">
+                <core-toolbar class="{{ {'medium-tall' : !narrow} | tokenList }}">
                     <paper-icon-button hidden?={{!narrow}} id="menu" icon="menu" on-click="{{toggleDrawer}}">
                     </paper-icon-button>
                     <div flex>Djinn</div>
@@ -83,8 +91,8 @@
 
               <template repeat="{{id in keys}}">
 
-                <div class="chip" hero-id="{{idea.content}}-{{idea.title}}" hero?="{{selectedIdea === idea }}">
-                  <div class="chip-top" style="background:{{ideas[id]['color']}};" hero-id="{{idea.content}}-{{idea.title}}-art" hero?="{{selectedIdea === idea}}"></div>
+                <div class="chip" hero-id="{{idea.content}}-{{idea.title}}" hero?="{{selectedItem === idea }}">
+                  <div class="chip-top" style="background:{{ideas[id]['color']}};" hero-id="{{idea.content}}-{{idea.title}}-art" hero?="{{selectedItem === idea}}"></div>
                   <div class="chip-bottom">
                     <div class="chip-title">{{ideas[id]['title']}}</div>
                     <div class="chip-content">{{ideas[id]['content']}}</div>
@@ -98,12 +106,12 @@
 
           <section id="details">
 
-            <div class="card" layout horizontal hero-id="{{selectedIdea.content}}-{{selectedIdea.title}}" hero on-tap="{{transition}}">
-              <div class="card-left" style="background:{{selectedIdea.color}};" hero-id="{{selectedIdea.content}}-{{selectedIdea.title}}-art" hero></div>
+            <div class="card" layout horizontal hero-id="{{selectedItem.content}}-{{selectedItem.title}}" hero on-tap="{{transition}}">
+              <div class="card-left" style="background:{{selectedItem.color}};" hero-id="{{selectedItem.content}}-{{selectedItem.title}}-art" hero></div>
               <div class="card-right" flex>
                 <div layout horizontal center>
                   <div>
-                    <div class="card-icon" style="background:{{selectedIdea.color}};"></div>
+                    <div class="card-icon" style="background:{{selectedItem.color}};"></div>
                   </div>
                   <div flex>
                     <div class="card-title">{{ideas[id]['title']}}</div>
@@ -127,11 +135,11 @@
                                 <paper-input id="title" label="Title"></paper-input>
                                 <paper-autogrow-textarea id="contentArea">
                                   <textarea id="content" placeholder="Explain your idea here..."></textarea>
-                                  <paper-radio-group id="color">
-                                      <paper-radio-button class="color" label="yellow" value=#f4db33></paper-radio-button>
-                                      <paper-radio-button class="color" label="red" value=#dc3c84></paper-radio-button>
-                                      <paper-radio-button class="color" label="purple" value=#972ff8></paper-radio-button>
-                                      <paper-radio-button class="color" label="blue" value=#7dd6fe></paper-radio-button>
+                                  <paper-radio-group id="color" valueattr="value" selected="#dc3c84">
+                                      <paper-radio-button class="c1" label="yellow" value=#f4db33></paper-radio-button>
+                                      <paper-radio-button class="c2" label="red" value=#dc3c84></paper-radio-button>
+                                      <paper-radio-button class="c3" label="purple" value=#972ff8></paper-radio-button>
+                                      <paper-radio-button class="c4" label="blue" value=#7dd6fe></paper-radio-button>
                                         
                                   </paper-radio-group>
                                 </paper-autogrow-textarea>
@@ -172,10 +180,10 @@
           },
         
       page: 0,
-      selectedIdea: null,
+      selectedItem: null,
       transition: function(e) {
         if (this.page === 0 && e.target.templateInstance.model.id) {
-          this.selectedIdea = e.target.templateInstance.model.id;
+          this.selectedItem = e.target.templateInstance.model.id;
           this.page = 1;
         } else {
           this.page = 0;
@@ -196,16 +204,11 @@
             return;
           }
             
-          if (!this.$.color.value.length) {
-            alert('Please choose a color.');
-            return;
-          }
-            
 
           var idea = this.$.base.push({
             title: this.$.title.value,
             content: this.$.content.value,
-            color: this.$.color.value,
+            color: this.$.color.selected,
             user: {
               uid: this.globals.currentUser.uid,
               username: this.globals.currentUser.google.displayName,
@@ -216,7 +219,6 @@
 
           this.$.title.value = '';
           this.$.content.value = '';
-          this.$.color.value = '';
         },
           
           viewIdea: function(e) {

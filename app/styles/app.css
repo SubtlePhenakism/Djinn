@@ -62,6 +62,8 @@
         text-align: start;
         background-color: #fff;
         box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+        min-width: 250px;
+        max-width: 300px;
       }
       .chip-top {
         width: 200px;
@@ -103,14 +105,14 @@
 
     paper-fab {
       position: fixed !important;
-      top: 164px;
+      top: 5em;
       right: 1em;
       z-index: 10;
     }
 
     .fab-2 {
       position: fixed !important;
-      bottom: 1em;
+      top: 90%;
       right: 1em;
       z-index: 10;
     }
@@ -132,3 +134,9 @@
         background-color: '#7dd6fe';
     }
 
+    [drawer] core-item {
+        height: 56px;
+        padding-left: 60px;
+        font-size: 15px;
+        color: #444;
+    }
