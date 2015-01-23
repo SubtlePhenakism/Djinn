@@ -1,8 +1,10 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
 <link rel="import" href="/bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="/bower_components/core-drawer-panel/core-drawer-panel.html">
 <link rel="import" href="/bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="/bower_components/core-icons/social-icons.html">
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="/bower_components/core-menu/core-menu.html">
 <link rel="import" href="/bower_components/paper-dropdown/paper-dropdown.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
@@ -17,72 +19,53 @@
 
 <polymer-element name="qa-app">
   <template>
-    <style>
-      :host {
-          display: block;
-          font-family: RobotoDraft, "Helvetica Neue", Helvetica, Arial;
-          height: 100%;
-        }
-
-        core-header-panel {
-          height: 100%;
-        }
-
-        core-header-panel::shadow #mainContainer {
-          background: #f5f5f5;
-        }
-
-        core-toolbar {
-          background: none;
-        }
-
-        .core-header {
-          height: 60px;
-          line-height: 60px;
-          font-size: 18px;
-          padding: 0 10px;
-          background-color: #455A64;
-          color: #fff;
-          transition: height 0.2s;
-        }
-
-        .core-header paper-item {
-          color: #333;
-        }
-
-        .core-header paper-menu-button {
-          height: 40px;
-        }
-
-        .content {
-          background: #fff;
-        }
-    </style>
+  <link rel="stylesheet" href="/styles/app.css">
+      
       <firebase-login id="baseLogin" user="{{user}}" statusKnown="{{statusKnown}}" location="https://djinn.firebaseio.com" provider="google" on-login="{{onLogin}}" on-error="{{onLoginError}}"></firebase-login>
       <pvc-globals values="{{globals}}"></pvc-globals>
-      <core-header-panel>
-          <div class="core-header">
-            <core-toolbar>
-              <div flex>Djinn</div>
-              <paper-menu-button halign="right">
-                <paper-icon-button icon="social:person"></paper-icon-button>
-                <paper-dropdown class="dropdown" transition="">
-                  <core-menu class="menu">
-                    <paper-item on-click="{{login}}" hidden?="{{!statusKnown || user}}">Login</paper-item>
-                      <paper-item on-click="{{logout}}" hidden?="{{!statusKnown || !user}}">Logout</paper-item>
-                  </core-menu>
-                </paper-dropdown>
-              </paper-menu-button>
-                <template if="{{user}}">{{user.google.displayName}}</template>
-            </core-toolbar>
-          </div>
-          <div class="content">
-              <app-router>
-                <app-route path="/" import="/elements/questions/list.html" element="qa-list"></app-route>
-                <app-route path="/questions/:id" import="/elements/questions/view.html" element="qa-view"></app-route>
-              </app-router>
-            </div>
-        </core-header-panel>
+      
+      <core-drawer-panel responsiveWidth="600px" id="drawerPanel" narrow="{{narrow}}">
+            <core-header-panel drawer mode="waterfall-tall">
+                <core-toolbar class="{{ {tall : !narrow} | tokenList }}">
+                </core-toolbar>
+            </core-header-panel>
+            <core-header-panel main mode="waterfall">
+                <core-toolbar class="{{ {tall : !narrow} | tokenList }}">
+                    <paper-icon-button hidden?={{!narrow}} id="menu" icon="menu" on-click="{{toggleDrawer}}">
+                    </paper-icon-button>
+                  <div flex>Djinn</div>
+                    <div hidden?={{!hovered}}>
+                        <template if="{{user}}">{{user.google.displayName}}</template>
+                    </div>
+                  <paper-menu-button halign="right" 
+                        on-mouseover='{{onHovered}}' 
+                        on-mouseout='{{onUnhovered}}'>
+                    <template if="{{user}}">
+                         <img class="round" width="40" src="{{user.google.cachedUserProfile.picture}}">
+                    </template>
+                    <template if="{{!user}}">
+                         <paper-icon-button icon="social:person"></paper-icon-button>
+                    </template>
+                    <paper-dropdown class="dropdown" transition="800">
+                      <core-menu class="menu">
+                        <paper-item on-click="{{login}}" hidden?="{{!statusKnown || user}}">Login</paper-item>
+                          <paper-item on-click="{{logout}}" hidden?="{{!statusKnown || !user}}">Logout</paper-item>
+                      </core-menu>
+                    </paper-dropdown>
+                  </paper-menu-button>
+                    <paper-icon-button icon="search"></paper-icon-button>
+                </core-toolbar>
+              <div class="content">
+                  <app-router>
+                    <app-route path="/" import="/elements/ideas/list.html" element="ideas-list"></app-route>
+                    <app-route path="/ideas/:id" import="/elements/ideas/view.html" element="idea-view"></app-route>
+                  </app-router>
+              </div>
+                <app-router>
+                    <app-route path="/" import="/elements/ideas/list.html" element="new-idea"></app-route>
+                </app-router>
+            </core-header-panel>
+      </core-drawer-panel>
   </template>
   <script>
     (function () {
@@ -91,6 +74,9 @@
       Polymer({
           ready: function() {
             this.globals.firebase = 'djinn';
+          },
+          toggleDrawer: function() {
+            this.$.drawerPanel.togglePanel();
           },
           login: function() {
             this.$.baseLogin.login();
@@ -103,7 +89,15 @@
             },
             onLoginError: function(err) {
               console.log('An error occurred.');
-            }
+            },
+          hovered: false,
+          onHovered: function() {
+            this.hovered = true;
+          },
+          onUnhovered: function() {
+            this.hovered = false;
+          },
+          
       });
 
     })();

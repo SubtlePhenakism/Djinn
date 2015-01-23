@@ -1,0 +1,134 @@
+      :host {
+          font-family: RobotoDraft, "Helvetica Neue", Helvetica, Arial;
+        }
+
+        core-header-panel {
+          height: 100%;
+        }
+
+        [main] {
+          height: 100%;
+          background-color: #f1f1f3;
+        }
+
+        [drawer] {
+          background-color: #fff;
+        }
+
+        [drawer] core-toolbar {
+          background-color: #455A64;
+          color: #fff;
+        }
+
+        [main] core-toolbar {
+          background-color: #455A64;
+          color: #fff;
+        }
+
+
+        core-toolbar paper-item {
+          color: #333;
+        }
+
+        core-toolbar paper-menu-button {
+          height: 40px;
+        }
+
+        .content {
+          background: #fff;
+          margin: 2em;
+        }
+
+        .round {
+            border-radius: 50%;
+        }
+
+
+
+    .chip-container {
+        position: absolute;
+        top: 0;
+        right: 3em;
+        left: 0;
+        text-align: center;
+        padding: 1em;
+      }
+      .chip {
+        display: inline-block;
+        position: relative;
+        border-radius: 3px;
+        margin: 4px;
+        overflow: hidden;
+        text-align: start;
+        background-color: #fff;
+        box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+      }
+      .chip-top {
+        width: 200px;
+        height: 150px;
+      }
+      .chip-bottom {
+        padding: 8px;
+        line-height: 1.5;
+      }
+      .chip-title {
+        font-weight: bold;
+      }
+      #details {
+        padding: 20px 10% 0;
+      }
+      .card {
+        height: 400px;
+        border-radius: 3px;
+        text-align: start;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+      .card-left {
+        width: 400px;
+      }
+      .card-right {
+        padding: 24px;
+      }
+      .card-icon {
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        margin-right: 16px;
+      }
+      .card-title {
+        font-size: 2em;
+      }
+
+    paper-fab {
+      position: fixed !important;
+      top: 164px;
+      right: 1em;
+      z-index: 10;
+    }
+
+    .fab-2 {
+      position: fixed !important;
+      bottom: 1em;
+      right: 1em;
+      z-index: 10;
+    }
+
+     .c1 {
+        background-color: '#f4db33';
+        color: '#f4db33';
+    }
+
+     .c2 {
+        background-color: '#dc3c84';
+    }
+
+     .c3 {
+        background-color: '#972ff8';
+    }
+
+     .c4 {
+        background-color: '#7dd6fe';
+    }
+

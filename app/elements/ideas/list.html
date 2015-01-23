@@ -1,0 +1,175 @@
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+
+<link rel="import" href="/bower_components/paper-dialog/paper-action-dialog.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-input/paper-autogrow-textarea.html">
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html">
+
+<polymer-element name="ideas-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    
+        .idea {
+          padding: 20px;
+          background: #fff;
+        }
+
+        .idea h3 {
+          margin: 0;
+        }
+
+        .idea h3 a {
+          color: #333;
+          text-decoration: none;
+        }
+
+        .idea h3 a:hover {
+          color: #3F51B5;
+        }
+
+        .idea .user {
+          padding-right: 20px;
+        }
+        
+        .new-idea {
+          padding: 20px;
+          text-align: center;
+        }
+
+    </style>
+      
+      <firebase-element id="base" location="https://{{globals.firebase}}.firebaseio.com/ideas" data="{{ideas}}" keys="{{keys}}"></firebase-element>
+      
+  <pvc-globals values="{{globals}}"></pvc-globals>
+    <template repeat="{{id in keys}}">
+      <paper-shadow z="1">
+        <div class="idea">
+          <div horizontal center layout>
+            <div class="user">
+              <img width="40" src="{{idea[id]['user']['picture']}}">
+            </div>
+            <div class="details" flex>
+              <h3><a href="/#/ideas/{{id}}">{{ideas[id]['title']}}</a></h3>
+              <p>{{ideas[id]['content']}}</p>
+              <span class="metadata">by <a href="{{ideas[id]['user']['email']}}">{{ideas[id]['user']['username']}}</a> &bull; {{ideas[id]['timestamp']}}</span>
+            </div>
+            <div class="view">
+              <paper-icon-button on-click="{{viewIdea}}" idea-id="{{id}}" icon="arrow-forward" title="View Idea"></paper-icon-button>
+            </div>
+          </div>
+        </div>
+      </paper-shadow>
+    </template>
+      <div class="new-idea-button" narrow="{{narrow}}">
+          <paper-fab hidden?={{narrow}} icon="add" on-click="{{openDialog}}">
+                <paper-action-dialog id="ideaDialog" heading="New Idea" transition="core-transition-bottom">
+                  <form>
+                    <paper-input id="title" label="Title"></paper-input>
+                    <paper-autogrow-textarea id="contentArea">
+                      <textarea id="content" placeholder="Explain your idea here..."></textarea>
+                    </paper-autogrow-textarea>
+                  </form>
+                  <paper-button affirmative autofocus on-click="{{submitIdea}}">Add</paper-button>
+                </paper-action-dialog>
+            </paper-fab>
+        </div>
+        <paper-fab hidden?={{!narrow}} id="narrow-fab" icon="add" on-click="{{openDialog}}">
+            <paper-action-dialog id="ideaDialog" heading="New Idea" transition="core-transition-bottom">
+              <form>
+                <paper-input id="title" label="Title"></paper-input>
+                <paper-autogrow-textarea id="contentArea">
+                  <textarea id="content" placeholder="Explain your idea here..."></textarea>
+                </paper-autogrow-textarea>
+              </form>
+              <paper-button affirmative autofocus on-click="{{submitIdea}}">Add</paper-button>
+            </paper-action-dialog>
+        </paper-fab>
+    </template>
+    
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        openDialog: function() {
+          this.$.ideaDialog.toggle();
+        },
+        submitIdea: function() {
+          if (!this.$.title.value.length) {
+            alert('Please write a title.');
+            return;
+          }
+
+          if (!this.$.content.value.length) {
+            alert('Please write an idea.');
+            return;
+          }
+
+          var idea = this.$.base.push({
+            title: this.$.title.value,
+            content: this.$.content.value,
+            user: {
+              uid: this.globals.currentUser.uid,
+              username: this.globals.currentUser.google.displayName,
+              picture: this.globals.currentUser.google.cachedUserProfile.picture
+            },
+            timestamp: new Date().getTime()
+          });
+
+          this.$.title.value = '';
+          this.$.content.value = '';
+        },
+          
+          viewIdea: function(e) {
+              var id = e.target.getAttribute('idea-id');
+              document.location.href = '/#/ideas/' + id;
+            }
+      });
+
+    })();
+  </script>
+</polymer-element>
+
+<polymer-element name="new-idea" extends="ideas-list">
+    <template>
+        <style>
+                
+            #narrow-fab {
+                background-color: #E64A19;
+                  position: fixed !important;
+                  bottom: 1em;
+                  right: 1em;
+                  z-index: 10;
+            }
+        </style>
+        
+        <paper-fab hidden?={{narrow}} icon="add" on-click="{{openDialog}}">
+            <paper-action-dialog id="ideaDialog" heading="New Idea" transition="core-transition-bottom">
+              <form>
+                <paper-input id="title" label="Title"></paper-input>
+                <paper-autogrow-textarea id="contentArea">
+                  <textarea id="content" placeholder="Explain your idea here..."></textarea>
+                </paper-autogrow-textarea>
+              </form>
+              <paper-button affirmative autofocus on-click="{{submitIdea}}">Add</paper-button>
+            </paper-action-dialog>
+        </paper-fab>
+        <paper-fab hidden?={{!narrow}} id="narrow-fab" icon="add" on-click="{{openDialog}}">
+            <paper-action-dialog id="ideaDialog" heading="New Idea" transition="core-transition-bottom">
+              <form>
+                <paper-input id="title" label="Title"></paper-input>
+                <paper-autogrow-textarea id="contentArea">
+                  <textarea id="content" placeholder="Explain your idea here..."></textarea>
+                </paper-autogrow-textarea>
+              </form>
+              <paper-button affirmative autofocus on-click="{{submitIdea}}">Add</paper-button>
+            </paper-action-dialog>
+        </paper-fab>
+    </template>
+    <script>Polymer();</script>
+</polymer-element>
