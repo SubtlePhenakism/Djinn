@@ -30,6 +30,7 @@
 <link href="/bower_components/core-selector/core-selector.html" rel="import">
 <link href="/bower_components/paper-shadow/paper-shadow.html" rel="import">
 <link rel="import" href="/bower_components/core-item/core-item.html">
+<link rel="import" href="/bower_components/core-menu/core-submenu.html">
 
   <link href="paper-item.html" rel="import">
 
@@ -47,9 +48,23 @@
   <core-drawer-panel responsiveWidth="600px" id="drawerPanel" narrow="{{narrow}}">
             <core-header-panel drawer mode="waterfall">
                 <core-toolbar class="{{ {'medium-tall' : !narrow} | tokenList }}"></core-toolbar>
-                <core-menu id="side-nav" on-core-select="{{ menuSelect }}"></core-menu>
-                    <core-item label="My Ideas" tag="my-ideas" url="/elements/pages/my-ideas.html" horizontal center layout></core-item>
-                    <core-item label="Groups" tag="my-ideas" url="/elements/pages/my-ideas.html" horizontal center layout></core-item>
+                <core-menu id="side-nav" on-core-select="{{ page }}" selectedItem="label">
+                    <core-submenu label="My Ideas" tag="my-ideas">
+                        <template repeat="{{id in keys}}">
+                            <core-item label="{{ideas[id]['title']}}" horizontal center layout></core-item>
+                        </template>
+                    </core-submenu>
+                    <core-submenu label="Groups" tag="groups">
+                        <template repeat="{{id in keys}}">
+                            <core-item label="New Group" horizontal center layout></core-item>
+                        </template>
+                    </core-submenu>
+                    <core-submenu label="All Ideas" tag="all-ideas">
+                        <template repeat="{{id in keys}}">
+                            <core-item label="{{ideas[id]['title']}}" horizontal center layout></core-item>
+                        </template>
+                    </core-submenu>
+                </core-menu>
             </core-header-panel>
             <core-header-panel main mode="waterfall">
                 <core-toolbar class="{{ {'medium-tall' : !narrow} | tokenList }}">
@@ -91,8 +106,10 @@
 
               <template repeat="{{id in keys}}">
 
-                <div class="chip" hero-id="{{idea.content}}-{{idea.title}}" hero?="{{selectedItem === idea }}">
-                  <div class="chip-top" style="background:{{ideas[id]['color']}};" hero-id="{{idea.content}}-{{idea.title}}-art" hero?="{{selectedItem === idea}}"></div>
+                <div class="chip" hero-id="{{ideas[id].user.username}}-{{ideas[id]['title']}}" hero?="{{selectedIdea === id}}">
+                    <img class="avatar" width="40" src="{{ideas[id].user.picture}}">
+                  <div class="chip-top" style="background:{{ideas[id]['color']}};" hero-id="{{ideas[id].user.username}}-{{ideas[id]['title']}}-art" hero?="{{selectedIdea === idea}}">
+                    </div>
                   <div class="chip-bottom">
                     <div class="chip-title">{{ideas[id]['title']}}</div>
                     <div class="chip-content">{{ideas[id]['content']}}</div>
@@ -106,16 +123,16 @@
 
           <section id="details">
 
-            <div class="card" layout horizontal hero-id="{{selectedItem.content}}-{{selectedItem.title}}" hero on-tap="{{transition}}">
-              <div class="card-left" style="background:{{selectedItem.color}};" hero-id="{{selectedItem.content}}-{{selectedItem.title}}-art" hero></div>
+            <div class="card" layout horizontal hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}" hero on-tap="{{transition}}">
+              <div class="card-left" style="background:{{ideas[selectedIdea].color}};" hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}-art" hero></div>
               <div class="card-right" flex>
                 <div layout horizontal center>
                   <div>
-                    <div class="card-icon" style="background:{{selectedItem.color}};"></div>
+                    <div class="card-icon" style="background:{{ideas[selectedIdea].color}};"></div>
                   </div>
                   <div flex>
-                    <div class="card-title">{{ideas[id]['title']}}</div>
-                    <div class="card-content">{{ideas[id]['content']}}</div>
+                    <div class="card-title">{{ideas[selectedIdea].title}}</div>
+                    <div class="card-content">{{ideas[selectedIdea].content}}</div>
                   </div>
                 </div>
               </div>
@@ -180,10 +197,10 @@
           },
         
       page: 0,
-      selectedItem: null,
+      selectedIdea: null,
       transition: function(e) {
         if (this.page === 0 && e.target.templateInstance.model.id) {
-          this.selectedItem = e.target.templateInstance.model.id;
+          this.selectedIdea = e.target.templateInstance.model.id;
           this.page = 1;
         } else {
           this.page = 0;
@@ -212,7 +229,8 @@
             user: {
               uid: this.globals.currentUser.uid,
               username: this.globals.currentUser.google.displayName,
-              picture: this.globals.currentUser.google.cachedUserProfile.picture
+              picture: this.globals.currentUser.google.cachedUserProfile.picture,
+              groups: this.globals.currentUser.groups
             },
             timestamp: new Date().getTime()
           });
