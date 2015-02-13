@@ -48,10 +48,12 @@
   <core-drawer-panel responsiveWidth="600px" id="drawerPanel" narrow="{{narrow}}">
             <core-header-panel drawer mode="waterfall">
                 <core-toolbar class="{{ {'medium-tall' : !narrow} | tokenList }}"></core-toolbar>
-                <core-menu id="side-nav" on-core-select="{{ page }}" selectedItem="label">
+                <core-menu valueattr="id" id="side-nav" on-core-select="{{ page }}" selectedItem="label" selected="{{page}}">
                     <core-submenu label="My Ideas" tag="my-ideas">
-                        <template repeat="{{id in keys}}">
-                            <core-item label="{{ideas[id]['title']}}" horizontal center layout></core-item>
+                        <template repeat="{{id in keys}}" selected="{{ideas[id].user.username}}-{{ideas[id]['title']}}">
+                            <template if="{{ideas[id].user.username === user.google.displayName}}">
+                                <core-item label="{{ideas[id]['title']}}" horizontal center layout ></core-item>
+                            </template>
                         </template>
                     </core-submenu>
                     <core-submenu label="Groups" tag="groups">
@@ -59,7 +61,7 @@
                             <core-item label="New Group" horizontal center layout></core-item>
                         </template>
                     </core-submenu>
-                    <core-submenu label="All Ideas" tag="all-ideas">
+                    <core-submenu label="Browse Ideas" tag="browse-ideas">
                         <template repeat="{{id in keys}}">
                             <core-item label="{{ideas[id]['title']}}" horizontal center layout></core-item>
                         </template>
@@ -98,13 +100,13 @@
                     
                 </core-toolbar>
       <div class="main-container">
-        <core-animated-pages selected="{{page}}" transitions="hero-transition" on-core-animated-pages-transition-end="{{complete}}">
+        <core-animated-pages valueattr="id" selected="{{page}}" transitions="hero-transition" on-core-animated-pages-transition-end="{{complete}}">
 
-          <section>
+          <section hash="{{id.hash}}">
 
             <div class="chip-container" hero-p on-tap="{{transition}}">
 
-              <template repeat="{{id in keys}}">
+              <template repeat="{{id in keys}}" selected="{{ideas[id].user.username}}-{{ideas[id]['title']}}">
 
                 <div class="chip" hero-id="{{ideas[id].user.username}}-{{ideas[id]['title']}}" hero?="{{selectedIdea === id}}">
                     <img class="avatar" width="40" src="{{ideas[id].user.picture}}">
@@ -123,9 +125,10 @@
 
           <section id="details">
 
-            <div class="card" layout horizontal hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}" hero on-tap="{{transition}}">
-              <div class="card-left" style="background:{{ideas[selectedIdea].color}};" hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}-art" hero></div>
-              <div class="card-right" flex>
+            <div class="card" hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}" hero on-tap="{{transition}}" selected="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}">
+                <img class="avatar" width="40" src="{{ideas[selectedIdea].user.picture}}">
+              <div class="card-top" style="background:{{ideas[selectedIdea].color}};" hero-id="{{ideas[selectedIdea].user.username}}-{{ideas[selectedIdea].title}}-art" hero></div>
+              <div class="card-bottom">
                 <div layout horizontal center>
                   <div>
                     <div class="card-icon" style="background:{{ideas[selectedIdea].color}};"></div>
@@ -134,6 +137,9 @@
                     <div class="card-title">{{ideas[selectedIdea].title}}</div>
                     <div class="card-content">{{ideas[selectedIdea].content}}</div>
                   </div>
+                    {{user.google.displayName}}
+                    {{ideas[selectedIdea].user.username}}
+                    
                 </div>
               </div>
             </div>
@@ -243,6 +249,7 @@
               var id = e.target.getAttribute('idea-id');
               document.location.href = '/#/ideas/' + id;
             }
+        
     });
   </script>
   </polymer-element>
